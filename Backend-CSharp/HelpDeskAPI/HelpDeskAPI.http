@@ -1,0 +1,45 @@
+POST https://localhost:7037/api/tickets
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJqdWFuQGVtcHJlc2EuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ikp1YW4gRW1wbGVhZG8iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJFbXBsZWFkbyIsImV4cCI6MTc4NzY1MTY0MiwiaXNzIjoiSGVscERlc2tBUEkiLCJhdWQiOiJIZWxwRGVza1VzZXJzIn0.Oq-6dyF0D_1_i1UF5VxkssnyAp8pjdpm4NdYGbZtzgI
+
+{
+  "titulo": "Mi computadora no enciende",
+  "descripcion": "Llegué a la oficina y la pantalla está completamente negra, huele a quemado.",
+  "creadorId": 1
+}
+
+### Actualizar y asignar ticket
+PUT https://localhost:7037/api/tickets/1/asignar
+Content-Type: application/json
+
+{
+  "tecnicoId": 1,
+  "nuevoEstadoId": 3,
+  "comentario": "He revisado el equipo, procedo a solicitar reemplazo de fuente de poder."
+}
+
+### Ver el historial de un ticket
+GET https://localhost:7037/api/tickets/1/historial
+
+
+### Iniciar Sesión (Login)
+POST https://localhost:7037/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@empresa.com",
+  "password": "12345"
+}
+### Obtener todos los tickets (Con Token)
+POST https://localhost:7037/api/tickets
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJqdWFuQGVtcHJlc2EuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ikp1YW4gRW1wbGVhZG8iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJFbXBsZWFkbyIsImV4cCI6MTc4NzY1MTY0MiwiaXNzIjoiSGVscERlc2tBUEkiLCJhdWQiOiJIZWxwRGVza1VzZXJzIn0.Oq-6dyF0D_1_i1UF5VxkssnyAp8pjdpm4NdYGbZtzgI
+{
+  "titulo": "Mi computadora no enciende",
+  "descripcion": "Llegué a la oficina y la pantalla está completamente negra, huele a quemado.",
+  "creadorId": 1
+}
+
+### Eliminar un ticket (Con Token)
+DELETE https://localhost:7037/api/tickets/6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJqdWFuQGVtcHJlc2EuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ikp1YW4gRW1wbGVhZG8iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJFbXBsZWFkbyIsImV4cCI6MTc4NzcxMDE3MywiaXNzIjoiSGVscERlc2tBUEkiLCJhdWQiOiJIZWxwRGVza1VzZXJzIn0.Z8d7Jk4oo-oLv8BimLqM4I5OKSfMA69SnjjSVuDhZCo

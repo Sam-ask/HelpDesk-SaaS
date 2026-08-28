@@ -1,0 +1,524 @@
+<!-- TIPOGRAFÍA Y ESTILOS MODERNOS SAAS -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :host { font-family: 'Inter', sans-serif; }
+  .saas-bg { background-color: #F6F8FB; }
+  .saas-text-main { color: #111827; }
+  .saas-text-sec { color: #64748B; }
+  .saas-card { background: #ffffff; border: 1px solid #e8ecf2; border-radius: 10px; }
+  .saas-btn-primary { background-color: #2563EB; color: white; border-radius: 8px; border: none; }
+  .saas-btn-primary:hover { background-color: #1d4ed8; color: white; }
+  .saas-badge { border-radius: 999px; font-size: 0.75rem; padding: 0.4em 0.8em; font-weight: 700; display: inline-block; }
+  .table-saas th { background-color: transparent !important; color: #64748B; font-weight: 600; font-size: 0.8rem; border-bottom: 2px solid #e8ecf2; padding-bottom: 1rem; }
+  .table-saas td { border-bottom: 1px solid #e8ecf2; vertical-align: middle; padding: 1rem 0.5rem; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; }
+  
+  /* COLORES FORZADOS PARA LOS ESTADOS */
+  .badge-abierto { background-color: #EFF6FF; color: #2563EB; }
+  .badge-asignado { background-color: #FEFCE8; color: #CA8A04; }
+  .badge-proceso { background-color: #FEFCE8; color: #CA8A04; }
+  .badge-resuelto { background-color: #F0FDF4; color: #16A34A; }
+  .badge-cerrado { background-color: #F1F5F9; color: #475569; }
+
+  /* COLORES FORZADOS PARA LOS ROLES */
+  .badge-admin { background-color: #EFF6FF; color: #2563EB; }
+  .badge-tecnico { background-color: #FEFCE8; color: #CA8A04; }
+  .badge-empleado { background-color: #F1F5F9; color: #475569; }
+
+  /* BOTONES DE ACCIÓN SAAS */
+  .btn-action { border-radius: 6px; font-weight: 600; font-size: 0.8rem; padding: 0.3rem 0.6rem; border: none; transition: 0.2s; }
+  .btn-action-edit { background-color: #EFF6FF; color: #2563EB; }
+  .btn-action-edit:hover { background-color: #DBEAFE; }
+  .btn-action-del { background-color: #FEF2F2; color: #DC2626; }
+  .btn-action-del:hover { background-color: #FEE2E2; }
+  .btn-action-take { background-color: #F0FDF4; color: #16A34A; }
+  .btn-action-take:hover { background-color: #DCFCE7; }
+</style>
+
+<div *ngIf="!token" class="min-vh-100 d-flex flex-column justify-content-center align-items-center" style="background-color: #111827;">
+  <div class="text-center mb-4">
+    <h2 class="fw-bolder text-white mb-1">Mi HelpDesk</h2>
+    <p class="text-white-50 fs-6">Acceso al sistema</p>
+  </div>
+  <div class="card saas-card p-5" style="width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+    <h5 class="text-center mb-4 fw-bold saas-text-main">Iniciar Sesión</h5>
+    <div class="mb-3">
+      <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Correo Electrónico</label>
+      <input type="email" class="form-control bg-light border-0 py-2" [(ngModel)]="email" placeholder="usuario@empresa.com" style="border-radius: 8px;">
+    </div>
+    <div class="mb-4">
+      <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Contraseña</label>
+      <input type="password" class="form-control bg-light border-0 py-2" [(ngModel)]="password" placeholder="••••••••" style="border-radius: 8px;">
+    </div>
+    <button (click)="hacerLogin()" class="btn saas-btn-primary w-100 py-2 fw-bold shadow-sm">Ingresar</button>
+    <div *ngIf="mensajeError" class="alert alert-danger mt-4 text-center mb-0 border-0" style="border-radius: 8px; font-size: 0.9rem;">
+      {{ mensajeError }}
+    </div>
+  </div>
+</div>
+
+<div *ngIf="token" class="d-flex w-100 saas-bg" style="min-height: 100vh;">
+  
+  <div class="d-none d-md-flex flex-column flex-shrink-0 p-3 text-white" style="width: 260px; background-color: #111827;">
+    <a href="javascript:void(0)" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none px-2 mt-2">
+      <span class="fs-5 fw-bolder">Mi HelpDesk</span>
+    </a>
+    <hr style="border-color: #334155;">
+    
+    <ul class="nav nav-pills flex-column mb-auto gap-1 mt-2">
+      <li class="nav-item">
+        <a href="javascript:void(0)" (click)="cambiarVista('dashboard')" class="nav-link fw-semibold"
+           [ngStyle]="vistaActual === 'dashboard' ? {'background-color': '#2563EB', 'color': 'white', 'border-radius': '8px'} : {'color': '#64748B'}">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" (click)="cambiarVista('tickets')" class="nav-link fw-semibold"
+           [ngStyle]="vistaActual === 'tickets' ? {'background-color': '#2563EB', 'color': 'white', 'border-radius': '8px'} : {'color': '#64748B'}">
+          <i class="bi bi-ticket-detailed me-2"></i> Tickets
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" (click)="cambiarVista('usuarios')" class="nav-link fw-semibold"
+           [ngStyle]="vistaActual === 'usuarios' ? {'background-color': '#2563EB', 'color': 'white', 'border-radius': '8px'} : {'color': '#64748B'}">
+          <i class="bi bi-people me-2"></i> Usuarios
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" (click)="cambiarVista('tecnicos')" class="nav-link fw-semibold"
+           [ngStyle]="vistaActual === 'tecnicos' ? {'background-color': '#2563EB', 'color': 'white', 'border-radius': '8px'} : {'color': '#64748B'}">
+          <i class="bi bi-headset me-2"></i> Técnicos
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" (click)="cambiarVista('reportes')" class="nav-link fw-semibold"
+           [ngStyle]="vistaActual === 'reportes' ? {'background-color': '#2563EB', 'color': 'white', 'border-radius': '8px'} : {'color': '#64748B'}">
+          <i class="bi bi-bar-chart me-2"></i> Reportes
+        </a>
+      </li>
+    </ul>
+
+    <hr style="border-color: #334155;">
+    <button (click)="cerrarSesion()" class="btn text-start text-white-50 border-0 fw-semibold w-100" style="border-radius: 8px;">
+      <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesión
+    </button>
+  </div>
+
+  <div class="flex-grow-1 p-4 p-md-5 overflow-auto">
+    
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 pb-2">
+      <div class="mb-3 mb-md-0">
+        <h3 class="fw-bolder saas-text-main mb-1 text-capitalize">{{ vistaActual }}</h3>
+        <p class="saas-text-sec mb-0" *ngIf="vistaActual === 'dashboard'">Buenos días, {{ usuarioActualNombre }} 👋</p>
+        <p class="saas-text-sec mb-0" *ngIf="vistaActual !== 'dashboard'">Gestión de {{ vistaActual }} del sistema.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button *ngIf="vistaActual === 'dashboard' || vistaActual === 'tickets'" (click)="exportarExcel()" class="btn bg-white saas-text-main fw-semibold shadow-sm border" style="border-radius: 8px; border-color: #e8ecf2 !important;">
+          <i class="bi bi-download me-1"></i> Exportar
+        </button>
+        <button *ngIf="!mostrarFormulario && (vistaActual === 'dashboard' || vistaActual === 'tickets')" (click)="abrirFormularioCrear()" class="btn saas-btn-primary fw-semibold shadow-sm px-4">
+          + Nuevo ticket
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="mostrarFormulario" class="card saas-card mb-4 shadow-sm">
+      <div class="card-body p-4">
+        <h5 class="fw-bold saas-text-main mb-4">{{ ticketEditando ? 'Editar Ticket ' + formatearFolio(ticketEditando) : 'Crear Nuevo Ticket' }}</h5>
+        <div class="row g-3">
+          
+          <div class="col-12">
+            <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Asunto del problema</label>
+            <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevoTitulo" style="border-radius: 8px;">
+          </div>
+          
+          <div class="col-12">
+            <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Descripción</label>
+            <textarea class="form-control bg-light border-0" [(ngModel)]="nuevaDescripcion" rows="2" style="border-radius: 8px;"></textarea>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Categoría</label>
+            <select class="form-select bg-light border-0" [(ngModel)]="nuevaCategoriaId" style="border-radius: 8px;">
+              <option [ngValue]="1">Hardware</option>
+              <option [ngValue]="2">Software</option>
+              <option [ngValue]="3">Redes / Internet</option>
+              <option [ngValue]="4">Accesos / Cuentas</option>
+              <option [ngValue]="5">Otro</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Prioridad</label>
+            <select class="form-select bg-light border-0" [(ngModel)]="nuevaPrioridadId" style="border-radius: 8px;">
+              <option [ngValue]="1">Baja</option>
+              <option [ngValue]="2">Media</option>
+              <option [ngValue]="3">Alta</option>
+              <option [ngValue]="4">Urgente</option>
+            </select>
+          </div>
+
+          <div class="col-md-4" *ngIf="ticketEditando">
+            <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Estado</label>
+            <select class="form-select bg-light border-0" [(ngModel)]="nuevoEstadoId" style="border-radius: 8px;">
+              <option [ngValue]="1">Abierto</option>
+              <option [ngValue]="2">Asignado</option>
+              <option [ngValue]="3">En Proceso</option>
+              <option [ngValue]="4">Resuelto</option>
+              <option [ngValue]="5">Cerrado</option>
+            </select>
+          </div>
+
+          <div class="col-12" *ngIf="ticketEditando">
+            <label class="form-label saas-text-sec fw-semibold" style="font-size: 0.85rem;">Comentario de actualización</label>
+            <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevoComentario" style="border-radius: 8px;">
+          </div>
+        </div>
+        
+        <div class="d-flex gap-2 mt-4">
+          <button (click)="guardarTicket()" class="btn saas-btn-primary fw-semibold px-4">{{ ticketEditando ? 'Guardar cambios' : 'Crear ticket' }}</button>
+          <button (click)="cancelarEdicion()" class="btn bg-white border fw-semibold saas-text-sec" style="border-radius: 8px;">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="vistaActual === 'dashboard'">
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card saas-card p-3 shadow-sm h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="saas-text-sec fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.5px;">TOTAL TICKETS</span>
+              <span class="avatar bg-light text-secondary" style="width: 24px; height: 24px;"><i class="bi bi-stack"></i></span>
+            </div>
+            <h2 class="fw-bolder saas-text-main mb-0">{{ totalTickets }}</h2>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card saas-card p-3 shadow-sm h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="saas-text-sec fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.5px;">ABIERTOS</span>
+              <span style="color: #2563EB;">●</span>
+            </div>
+            <h2 class="fw-bolder saas-text-main mb-0">{{ ticketsAbiertos }}</h2>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card saas-card p-3 shadow-sm h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="saas-text-sec fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.5px;">EN PROCESO</span>
+              <span style="color: #CA8A04;">●</span>
+            </div>
+            <h2 class="fw-bolder saas-text-main mb-0">{{ ticketsEnProceso }}</h2>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card saas-card p-3 shadow-sm h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="saas-text-sec fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.5px;">RESUELTOS</span>
+              <span style="color: #16A34A;">●</span>
+            </div>
+            <h2 class="fw-bolder saas-text-main mb-0">{{ ticketsResueltos }}</h2>
+          </div>
+        </div>
+      </div>
+
+      <h5 class="fw-bold saas-text-main mb-3">Actividad Reciente</h5>
+      
+      <div class="card saas-card shadow-sm border-0 overflow-hidden mb-5">
+        <div class="table-responsive px-3">
+          <table class="table table-saas align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="border-top-0 pt-4">FOLIO</th>
+                <th class="border-top-0 pt-4">TICKET</th>
+                <th class="border-top-0 pt-4">PRIORIDAD</th>
+                <th class="border-top-0 pt-4">ESTATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let ticket of ticketsFiltrados | slice:0:5">
+                <td class="saas-text-sec fw-semibold" style="font-size: 0.9rem;">{{ formatearFolio(ticket.id) }}</td>
+                <td>
+                  <div class="fw-bold saas-text-main" style="font-size: 0.95rem;">{{ ticket.titulo }}</div>
+                  <div class="saas-text-sec mt-1" style="font-size: 0.8rem;">
+                    <span class="badge bg-light text-secondary border me-2">{{ obtenerNombreCategoria(ticket.categoriaId) }}</span>
+                    Por {{ ticket.creador?.nombre || 'Desconocido' }}
+                  </div>
+                </td>
+                <td style="font-size: 0.85rem;" class="fw-semibold">
+                  <i class="bi {{ obtenerPrioridad(ticket.prioridadId).icono }} {{ obtenerPrioridad(ticket.prioridadId).colorClase }} me-1"></i>
+                  <span class="saas-text-main">{{ obtenerPrioridad(ticket.prioridadId).nombre }}</span>
+                </td>
+                <td>
+                  <span class="saas-badge" [ngClass]="{'badge-abierto': ticket.estadoId === 1, 'badge-asignado': ticket.estadoId === 2, 'badge-proceso': ticket.estadoId === 3, 'badge-resuelto': ticket.estadoId === 4, 'badge-cerrado': ticket.estadoId === 5}">
+                    ● {{ obtenerNombreEstado(ticket.estadoId) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div> 
+
+    
+    <div *ngIf="vistaActual === 'tickets'">
+      
+      <div class="row g-2 mb-3">
+        <div class="col-12 col-md-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 saas-text-sec" style="border-radius: 8px 0 0 8px;"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control bg-white border-start-0 saas-text-sec ps-0" [(ngModel)]="filtroTexto" (keyup)="filtrarTickets()" placeholder="Buscar asunto o folio..." style="border-radius: 0 8px 8px 0; box-shadow: none;">
+          </div>
+        </div>
+        <div class="col-6 col-md-2"><input type="text" class="form-control bg-white saas-text-sec" [(ngModel)]="filtroSolicitante" (keyup)="filtrarTickets()" placeholder="Solicitante" style="border-radius: 8px;"></div>
+        <div class="col-6 col-md-2"><input type="text" class="form-control bg-white saas-text-sec" [(ngModel)]="filtroTecnico" (keyup)="filtrarTickets()" placeholder="Técnico" style="border-radius: 8px;"></div>
+        <div class="col-8 col-md-2">
+          <select class="form-select bg-white saas-text-sec" [(ngModel)]="filtroEstatus" (change)="filtrarTickets()" style="border-radius: 8px;">
+            <option [ngValue]="0">Estatus: Todos</option><option [ngValue]="1">Abierto</option><option [ngValue]="2">Asignado</option><option [ngValue]="3">En Proceso</option><option [ngValue]="4">Resuelto</option><option [ngValue]="5">Cerrado</option>
+          </select>
+        </div>
+        <div class="col-4 col-md-1"><button class="btn btn-light w-100 border text-secondary" (click)="limpiarFiltros()" style="border-radius: 8px;" title="Limpiar"><i class="bi bi-x-circle"></i></button></div>
+      </div>
+
+      <div class="card saas-card shadow-sm border-0 overflow-hidden mb-5">
+        <div class="table-responsive px-3">
+          <table class="table table-saas align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="border-top-0 pt-4">FOLIO</th>
+                <th class="border-top-0 pt-4">TICKET</th>
+                <th class="border-top-0 pt-4">PRIORIDAD</th>
+                <th class="border-top-0 pt-4">ASIGNADO A</th>
+                <th class="border-top-0 pt-4">ESTATUS</th>
+                <th class="border-top-0 pt-4 text-end">ACCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let ticket of ticketsFiltrados">
+                <td class="saas-text-sec fw-semibold" style="font-size: 0.9rem;">{{ formatearFolio(ticket.id) }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-light text-primary me-3 border">{{ obtenerInicial(ticket.creador?.nombre) }}</div>
+                    <div>
+                      <div class="fw-bold saas-text-main" style="font-size: 0.95rem;">{{ ticket.titulo }}</div>
+                      <div class="saas-text-sec mt-1" style="font-size: 0.8rem;">
+                        <span class="badge bg-light text-secondary border me-1">{{ obtenerNombreCategoria(ticket.categoriaId) }}</span>
+                        Por {{ ticket.creador?.nombre || 'Desconocido' }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td style="font-size: 0.85rem;" class="fw-semibold">
+                  <i class="bi {{ obtenerPrioridad(ticket.prioridadId).icono }} {{ obtenerPrioridad(ticket.prioridadId).colorClase }} me-1"></i>
+                  <span class="saas-text-main">{{ obtenerPrioridad(ticket.prioridadId).nombre }}</span>
+                </td>
+                <td class="saas-text-sec" style="font-size: 0.9rem;">
+                  <span *ngIf="ticket.tecnico" class="fw-semibold text-dark"><i class="bi bi-person-fill text-muted me-1"></i> {{ ticket.tecnico.nombre }}</span>
+                  <span *ngIf="!ticket.tecnico" class="text-muted fst-italic">Sin asignar</span>
+                </td>
+                <td>
+                  <span class="saas-badge" [ngClass]="{'badge-abierto': ticket.estadoId === 1, 'badge-asignado': ticket.estadoId === 2, 'badge-proceso': ticket.estadoId === 3, 'badge-resuelto': ticket.estadoId === 4, 'badge-cerrado': ticket.estadoId === 5}">
+                    ● {{ obtenerNombreEstado(ticket.estadoId) }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="d-flex gap-2 justify-content-end align-items-center">
+                    <button (click)="verHistorial(ticket.id)" class="btn btn-action bg-light text-secondary border" title="Ver Historial"><i class="bi bi-clock-history"></i></button>
+                    <button *ngIf="!ticket.tecnico && (usuarioActualRol === 'Administrador' || usuarioActualRol === 'Admin' || usuarioActualRol === 'Tecnico' || usuarioActualRol === 'Técnico')" (click)="asignarmeTicket(ticket)" class="btn btn-action btn-action-take">Tomar</button>
+                    <button *ngIf="usuarioActualRol === 'Administrador' || usuarioActualRol === 'Admin' || usuarioActualRol === 'Tecnico' || usuarioActualRol === 'Técnico'" (click)="cargarParaEditar(ticket)" class="btn btn-action btn-action-edit">Editar</button>
+                    <button *ngIf="usuarioActualRol === 'Administrador' || usuarioActualRol === 'Admin'" (click)="eliminarTicket(ticket.id)" class="btn btn-action btn-action-del">Borrar</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div> 
+    <div *ngIf="vistaActual === 'tecnicos'">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold saas-text-main mb-0">Personal de Soporte IT</h5>
+      </div>
+      <div class="card saas-card shadow-sm border-0 overflow-hidden">
+        <div class="table-responsive px-3">
+          <table class="table table-saas align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="border-top-0 pt-4">TÉCNICO / ADMIN</th>
+                <th class="border-top-0 pt-4">NIVEL</th>
+                <th class="border-top-0 pt-4 text-end">ACCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tecnico of listaTecnicos">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-primary text-white me-3">{{ obtenerInicial(tecnico.nombre) }}</div>
+                    <div>
+                      <div class="fw-bold saas-text-main" style="font-size: 0.95rem;">{{ tecnico.nombre }}</div>
+                      <div class="saas-text-sec" style="font-size: 0.8rem;">{{ tecnico.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="saas-text-sec fw-semibold" style="font-size: 0.9rem;">
+                  <i class="bi bi-star-fill text-warning me-1"></i> {{ tecnico.rolNombre }}
+                </td>
+                <td class="text-end"><button class="btn btn-action bg-light text-secondary border">Auditar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+   
+    <div *ngIf="vistaActual === 'usuarios'">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold saas-text-main mb-0">Directorio de Empleados</h5>
+        <button class="btn saas-btn-primary fw-semibold shadow-sm px-3">+ Nuevo Usuario</button>
+      </div>
+      <div class="card saas-card shadow-sm border-0 overflow-hidden">
+        <div class="table-responsive px-3">
+          <table class="table table-saas align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="border-top-0 pt-4">EMPLEADO</th>
+                <th class="border-top-0 pt-4">ROL EN EL SISTEMA</th>
+                <th class="border-top-0 pt-4 text-end">ACCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of listaUsuarios">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-light text-primary me-3 border">{{ obtenerInicial(user.nombre) }}</div>
+                    <div>
+                      <div class="fw-bold saas-text-main" style="font-size: 0.95rem;">{{ user.nombre }}</div>
+                      <div class="saas-text-sec" style="font-size: 0.8rem;">{{ user.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="saas-badge" 
+                        [ngClass]="{
+                          'badge-admin': user.rolNombre === 'Administrador' || user.rolNombre === 'Admin',
+                          'badge-tecnico': user.rolNombre === 'Técnico' || user.rolNombre === 'Tecnico',
+                          'badge-empleado': user.rolNombre === 'Empleado'
+                        }">
+                    ● {{ user.rolNombre }}
+                  </span>
+                </td>
+                <td class="text-end"><button class="btn btn-action btn-action-edit">Editar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="vistaActual === 'reportes'">
+      
+      <!-- FILA 1: TARJETAS SUPERIORES -->
+      <div class="row g-3 mb-4">
+        <!-- 1. Tasa de Resolución (Verde) -->
+        <div class="col-12 col-md-4">
+          <div class="card saas-card p-4 shadow-sm h-100 border-0" style="border-left: 4px solid #16A34A !important;">
+            <h6 class="saas-text-sec fw-bold mb-3" style="letter-spacing: 0.5px;">TASA DE RESOLUCIÓN GLOBAL</h6>
+            <h1 class="fw-bolder saas-text-main mb-1">{{ tasaResolucion }}%</h1>
+            <p class="text-success fw-semibold mb-0" style="font-size: 0.85rem;">
+              <i class="bi bi-check-circle-fill me-1"></i> De un total de {{ totalTickets }} tickets registrados
+            </p>
+          </div>
+        </div>
+        
+        <!-- 2. Tickets Sin Asignar (Naranja) -->
+        <div class="col-12 col-md-4">
+          <div class="card saas-card p-4 shadow-sm h-100 border-0" style="border-left: 4px solid #F59E0B !important;">
+            <h6 class="saas-text-sec fw-bold mb-3" style="letter-spacing: 0.5px;">TICKETS SIN ASIGNAR</h6>
+            <h1 class="fw-bolder mb-1" style="color: #F59E0B;">{{ ticketsSinAsignar }}</h1>
+            <p class="text-muted fw-semibold mb-0" style="font-size: 0.85rem;">
+              <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Requieren ser asignados
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. Tickets Urgentes (Rojo) -->
+        <div class="col-12 col-md-4">
+          <div class="card saas-card p-4 shadow-sm h-100 border-0" style="border-left: 4px solid #DC2626 !important;">
+            <h6 class="saas-text-sec fw-bold mb-3" style="letter-spacing: 0.5px;">URGENCIAS ACTIVAS</h6>
+            <h1 class="fw-bolder mb-1" style="color: #DC2626;">{{ ticketsUrgentes }}</h1>
+            <p class="text-danger fw-semibold mb-0" style="font-size: 0.85rem;">
+              <i class="bi bi-exclamation-circle-fill me-1"></i> Requieren atención inmediata
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        
+        <div class="col-12 col-md-6">
+          <div class="card saas-card p-4 shadow-sm h-100 border-0">
+            <h6 class="saas-text-sec fw-bold mb-4" style="letter-spacing: 0.5px;">INCIDENCIAS POR CATEGORÍA</h6>
+            
+            <div *ngFor="let cat of metricasCategorias" class="mb-3">
+              <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                <span class="fw-semibold saas-text-main">{{ cat.nombre }}</span>
+                <span class="text-muted">{{ cat.count }} tickets ({{ cat.porcentaje }}%)</span>
+              </div>
+              <div class="progress" style="height: 8px; border-radius: 4px; background-color: #f1f5f9;">
+                <div class="progress-bar {{ cat.color }}" role="progressbar" [style.width.%]="cat.porcentaje"></div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="card saas-card p-4 shadow-sm h-100 border-0">
+            <h6 class="saas-text-sec fw-bold mb-4" style="letter-spacing: 0.5px;">VOLUMEN POR PRIORIDAD</h6>
+            
+            <div class="d-flex flex-column gap-3">
+              <div *ngFor="let prio of metricasPrioridades" class="d-flex align-items-center justify-content-between p-3" [ngStyle]="{'background-color': prio.bg, 'border-radius': '10px'}">
+                <div class="d-flex align-items-center">
+                  <i class="bi {{ prio.icono }} {{ prio.txt }} fs-4 me-3"></i>
+                  <span class="fw-bold saas-text-main fs-6">{{ prio.nombre }}</span>
+                </div>
+                <h3 class="fw-bolder mb-0 {{ prio.txt }}">{{ prio.count }}</h3>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        
+      </div>
+    </div> 
+
+  </div>
+</div>
+
+<div *ngIf="historialSeleccionado" class="modal d-block" tabindex="-1" style="background-color: rgba(17,24,39,0.7); backdrop-filter: blur(4px);">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content saas-card shadow-lg border-0" style="border-radius: 12px;">
+      <div class="modal-header bg-light border-bottom-0 py-3" style="border-radius: 12px 12px 0 0;">
+        <h6 class="modal-title fw-bold saas-text-main">Línea de tiempo - Ticket {{ formatearFolio(ticketHistorialId) }}</h6>
+        <button type="button" class="btn-close" (click)="cerrarHistorial()"></button>
+      </div>
+      <div class="modal-body p-4 bg-white">
+        <div *ngIf="historialSeleccionado.length === 0" class="text-center saas-text-sec my-4"><p class="mb-0">Aún no hay movimientos.</p></div>
+        <ul class="list-group list-group-flush">
+          <li *ngFor="let evento of historialSeleccionado" class="list-group-item px-0 py-3 border-bottom">
+            <div class="d-flex justify-content-between w-100 mb-1">
+              <h6 class="mb-0 fw-bold" style="color: #2563EB; font-size: 0.95rem;">{{ evento.usuario }}</h6>
+              <small class="saas-text-sec" style="font-size: 0.8rem;">{{ evento.fecha | date:'short' }}</small>
+            </div>
+            <p class="mb-0 saas-text-main mt-1" style="font-size: 0.9rem;">{{ evento.accion }}</p>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer border-top-0 bg-light" style="border-radius: 0 0 12px 12px;">
+        <button type="button" class="btn bg-white border fw-semibold saas-text-sec px-4" style="border-radius: 8px;" (click)="cerrarHistorial()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
